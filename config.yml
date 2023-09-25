@@ -1,0 +1,55 @@
+---
+- hosts: all
+  become: true
+  vars:
+    new_username: abby_laxamana
+
+  tasks:
+
+  - name: install python3
+    package:
+      name: python3
+      state: latest
+
+  - name: install pip3
+    package:
+      name: python3-pip
+      state: latest
+
+  - name: pip3 as default
+    set_fact:
+      ansible_python_interpreter: /usr/bin/python3
+
+  - name: install java for ubuntu
+    apt:
+      name: openjdk-11-jdk
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+  - name: install java for centos
+    dnf:
+      name: java-11-openjdk-devel
+      state: latest
+      update_cache: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: create motd
+    template:
+      src: /home/laxamana_ubuntu/Laxamana_PrelimExam/motd.yml
+      dest: /etc/motd
+
+  - name: create a user
+    user:
+      name: "{{ new_username }}"
+      state: present
+
+#  - name: read motd
+#    include_vars:
+#      file: motd.yml
+#      name: motd_data
+
+#  - name: set motd as default if not defined
+#    set_fact:
+#      motd_text: "Ansible Managed by laxamana_ubuntu"
+
